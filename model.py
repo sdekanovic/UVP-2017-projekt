@@ -1,9 +1,11 @@
+BELA, CRNA = 'O', 'X'
+
 class Figure:
     #Stevec za bele in crne figure
 
-    def __init__(self, bele_figure, crne_figure):
-        self.bele_figure = bele_figure
-        self.crne_figure = crne_figure
+    def __init__(self, igra):
+        self.bele_figure = len(igra.tocke_B)
+        self.crne_figure = len(igra.tocke_C)
         self.cas = 0
 
 
@@ -21,16 +23,16 @@ class Igra():
         self.tocke_B = [[3, 3], [4, 4]]
         self.tocke_C = [[3, 4], [4, 3]]
 
-        self.figure = Figure(2, 2)
+        self.figure = Figure(self)
 
     def __str__(self):
         self.seznam = []
         for _ in range(8):
             self.seznam.append(8*[0])
         for x, y in self.tocke_B:
-            self.seznam[x][y] = 'o'
+            self.seznam[x][y] = BELA
         for x, y in self.tocke_C:
-            self.seznam[x][y] = 'x'
+            self.seznam[x][y] = CRNA
         izpis = ''
         meja = '+'+self.dolzina*'-'+'+\n'
         for i in range(self.sirina):
@@ -41,18 +43,18 @@ class Igra():
                 else:
                     vrstica += k
             izpis += '|'+vrstica+'|'+'\n'
-        return '{}{}{}Belih: {}\nCrnih: {}\nNa potezi je {} igralec.'.format(meja, izpis, meja, self.figure.bele_figure, self.figure.crne_figure, self.na_potezi())
+        print(self.tocke_B, len(self.tocke_B), self.tocke_C, len(self.tocke_C))
+        return '{}{}{}Belih: {}\nCrnih: {}\nNa potezi je {} igralec.'.format(meja, izpis, meja, len(self.tocke_B), len(self.tocke_C), self.na_potezi())
 
     def dodaj(self, x, y):
         if self.poteza_je_uredu(x, y):
-            if self.na_potezi() == 'beli':
+            if self.na_potezi() == BELA:
                 if self.vodoravno(x, y):
                     self.zamenjaj_vodoravno(x, y)
                 if self.navpicno(x, y):
                     self.zamenjaj_navpicno(x, y)
                 self.tocke_B.append([x, y])
                 self.tocke_B.sort()
-                self.figure.bele_figure += 1
 
             else:
                 if self.vodoravno(x, y):
@@ -61,7 +63,6 @@ class Igra():
                     self.zamenjaj_navpicno(x, y)
                 self.tocke_C.append([x, y])
                 self.tocke_C.sort()
-                self.figure.crne_figure += 1
 
             self.figure.cas += 1
 
@@ -76,150 +77,118 @@ class Igra():
         return self.navpicno(x, y) or self.vodoravno(x, y)
 
     def navpicno(self, x, y):
-        if self.na_potezi() == 'beli':
+        if self.na_potezi() == BELA:
             if x <= len(self.seznam) - 2:
-                if self.seznam[x+1][y] == 'x':
+                if self.seznam[x+1][y] == CRNA:
                     for k in self.seznam[x+1:]:
-                        if k[y] == 'o':
+                        if k[y] == BELA:
                             return True
-            if self.seznam[x-1][y] == 'x':
+            if self.seznam[x-1][y] == CRNA:
                 for k in self.seznam[:x]:
-                    if k[y] == 'o':
+                    if k[y] == BELA:
                         return True
             else:
                 return False
         else:
             if x+1 < len(self.seznam):
-                if self.seznam[x+1][y] == 'o':
+                if self.seznam[x+1][y] == BELA:
                     for k in self.seznam[x+1:]:
-                        if k[y] == 'x':
+                        if k[y] == CRNA:
                             return True
-            if self.seznam[x-1][y] == 'o':
+            if self.seznam[x-1][y] == BELA:
                 for k in self.seznam[:x]:
-                    if k[y] == 'x':
+                    if k[y] == CRNA:
                         return True
             else:
                 return False
 
     def vodoravno(self, x, y):
-        if self.na_potezi() == 'beli':
+        if self.na_potezi() == BELA:
             if y <= len(self.seznam) - 2:
-                if self.seznam[x][y+1] == 'x':
+                if self.seznam[x][y+1] == CRNA:
                     for k in self.seznam[x][y+1:]:
-                        if k == 'o':
+                        if k == BELA:
                             return True
-            if self.seznam[x][y-1] == 'x':
+            if self.seznam[x][y-1] == CRNA:
                 for k in self.seznam[x][::-1][len(self.seznam)-y+1:]:
-                    if k == 'o':
+                    if k == BELA:
                         return True
             else:
                 return False
         else:
             if y+1 < len(self.seznam):
-                if self.seznam[x][y+1] == 'o':
+                if self.seznam[x][y+1] == BELA:
                     for k in self.seznam[x][y+1:]:
-                        if k == 'x':
+                        if k == CRNA:
                             return True
-            if self.seznam[x][y-1] == 'o':
+            if self.seznam[x][y-1] == BELA:
                 for k in self.seznam[x][::-1][len(self.seznam)-y+1:]:
-                    if k == 'x':
+                    if k == CRNA:
                         return True
             else:
                 return False
 
 
     def zamenjaj_vodoravno(self, x, y):
-        if self.na_potezi() == 'beli':
+        if self.na_potezi() == BELA:
             if y + 1 < len(self.seznam):
-                if self.seznam[x][y + 1] == 'x':
-                    a = 0 #število novih belih
+                if self.seznam[x][y + 1] == CRNA:
                     for k in range(y+1, len(self.seznam)):
-                        if self.seznam[x][k] == 'o' or self.seznam[x][k] == ' ':
-                            self.figure.bele_figure += a
-                            self.figure.crne_figure -= a
+                        if self.seznam[x][k] == BELA or self.seznam[x][k] == ' ':
                             break
-                        a += 1
                         self.tocke_B.append([x, k])
                         self.tocke_C.remove([x, k])
 
-            if self.seznam[x][y-1] == 'x':
-                a = 0
+            if self.seznam[x][y-1] == CRNA:
                 for k in range(y-1, -1, -1):
-                    if self.seznam[x][k] == 'o' or self.seznam[x][k] == ' ':
-                        self.figure.bele_figure += a
-                        self.figure.crne_figure -= a
+                    if self.seznam[x][k] == BELA or self.seznam[x][k] == ' ':
                         break
-                    a += 1
                     self.tocke_B.append([x, k])
                     self.tocke_C.remove([x, k])
         else:
             if y+1 < len(self.seznam):
-                if self.seznam[x][y + 1] == 'o':
-                    a = 0 #število novih crnih
+                if self.seznam[x][y + 1] == BELA:
                     for k in range(y+1, len(self.seznam)):
-                        if self.seznam[x][k] == 'x' or self.seznam[x][k] == ' ':
-                            self.figure.crne_figure += a
-                            self.figure.bele_figure -= a
+                        if self.seznam[x][k] == CRNA or self.seznam[x][k] == ' ':
                             break
-                        a += 1
                         self.tocke_C.append([x, k])
                         self.tocke_B.remove([x, k])
-            if self.seznam[x][y-1] == 'o':
-                a = 0
+            if self.seznam[x][y-1] == BELA:
                 for k in range(y-1, -1, -1):
-                    if self.seznam[x][k] == 'x' or self.seznam[x][k] == ' ':
-                        self.figure.crne_figure += a
-                        self.figure.bele_figure -= a
+                    if self.seznam[x][k] == CRNA or self.seznam[x][k] == ' ':
                         break
-                    a += 1
                     self.tocke_C.append([x, k])
                     self.tocke_B.remove([x, k])
 
     def zamenjaj_navpicno(self, x, y):
-        if self.na_potezi() == 'beli':
+        if self.na_potezi() == BELA:
             if x + 1 < len(self.seznam):
-                if self.seznam[x+1][y] == 'x':
-                    a = 0 #število novih belih
+                if self.seznam[x+1][y] == CRNA:
                     for k in range(x+1, len(self.seznam)):
-                        if self.seznam[k][y] == 'o' or self.seznam[k][y] == ' ':
-                            self.figure.bele_figure += a
-                            self.figure.crne_figure -= a
+                        if self.seznam[k][y] == BELA or self.seznam[k][y] == ' ':
                             break
-                        a += 1
                         self.tocke_B.append([k, y])
                         self.tocke_C.remove([k, y])
 
-            if self.seznam[x-1][y] == 'x':
-                a = 0
+            if self.seznam[x-1][y] == CRNA:
                 for k in range(x-1, -1, -1):
-                    if self.seznam[k][y] == 'o' or self.seznam[k][y] == ' ':
-                        self.figure.bele_figure += a
-                        self.figure.crne_figure -= a
+                    if self.seznam[k][y] == BELA or self.seznam[k][y] == ' ':
                         break
-                    a += 1
                     self.tocke_B.append([k, y])
                     self.tocke_C.remove([k, y])
 
         else:
             if x+1 < len(self.seznam):
-                if self.seznam[x+1][y] == 'o':
-                    a = 0 #število novih crnih
+                if self.seznam[x+1][y] == BELA:
                     for k in range(x+1, len(self.seznam)):
-                        if self.seznam[k][y] == 'x' or self.seznam[k][y] == ' ':
-                            self.figure.crne_figure += a
-                            self.figure.bele_figure -= a
+                        if self.seznam[k][y] == CRNA or self.seznam[k][y] == ' ':
                             break
-                        a += 1
                         self.tocke_C.append([k, y])
                         self.tocke_B.remove([k, y])
-            if self.seznam[x-1][y] == 'o':
-                a = 0
+            if self.seznam[x-1][y] == BELA:
                 for k in range(x-1, -1, -1):
-                    if self.seznam[k][y] == 'x' or self.seznam[k][y] == ' ':
-                        self.figure.crne_figure += a
-                        self.figure.bele_figure -= a
+                    if self.seznam[k][y] == CRNA or self.seznam[k][y] == ' ':
                         break
-                    a += 1
                     self.tocke_C.append([k, y])
                     self.tocke_B.remove([k, y])
 
@@ -227,9 +196,9 @@ class Igra():
 
     def na_potezi(self):
         if self.figure.cas % 2 == 0:
-            return 'beli'
+            return BELA
         else:
-            return 'crni'
+            return CRNA
 
 
 igra = Igra(8, 8)

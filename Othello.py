@@ -1,6 +1,10 @@
 import tkinter as tk
 import model
 
+ODMIK = 5
+MAX_DOLZINA = 400
+ENOTA = 50
+
 class Othello:
 
     def __init__(self, okno):
@@ -10,15 +14,15 @@ class Othello:
     def pripravi_gv(self, okno):
         prikaz = tk.Frame(okno)
         prikaz.grid(row=1, column=0)
-        gumb_print = tk.Button(prikaz, text='Izris', command=lambda:print(self.igra))
-        gumb_print.grid(row=1, column=0)
+        #gumb_print = tk.Button(prikaz, text='Izris', command=lambda:print(self.igra))
+        #gumb_print.grid(row=1, column=0)
         #gumb_rezultat = tk.Button(prikaz, text='Rezultat', command=self.rezultat)
         #gumb_rezultat.grid(row=1, column=1)
         #gumb_osvezi = tk.Button(prikaz, text='Osvezi', command=self.osvezi)
         #gumb_osvezi.grid(row=1, column=2)
         prikaz.pack()
 
-        self.plosca = tk.Canvas(width=400, height=400, bg='Green')
+        self.plosca = tk.Canvas(width=MAX_DOLZINA, height=MAX_DOLZINA, bg='#006400')
         self.plosca.pack()
         self.plosca.bind('<Button-1>', self.obdelaj_tipko)
         self.osvezi()
@@ -26,12 +30,12 @@ class Othello:
 
     def narisi(self):
         for k in range(1,8):
-            self.plosca.create_line(k*50, 0, k*50, 400)
-            self.plosca.create_line(0, k*50, 400, k*50)
+            self.plosca.create_line(k * ENOTA, 0, k * ENOTA, MAX_DOLZINA)
+            self.plosca.create_line(0, k * ENOTA, MAX_DOLZINA, k * ENOTA)
         for x, y in self.igra.tocke_B:
-            self.plosca.create_oval(50 * y +5, 50 * x +5, 50 * y + 50 -5, 50 * x + 50 -5, fill='white')
+            self.plosca.create_oval(ENOTA * y + ODMIK, ENOTA * x + ODMIK, ENOTA * y + ENOTA - ODMIK, ENOTA * x + ENOTA - ODMIK, fill='white')
         for x, y in self.igra.tocke_C:
-            self.plosca.create_oval(50 * y +5, 50 * x +5, 50 * y + 50 -5 , 50* x + 50-5, fill='black')
+            self.plosca.create_oval(ENOTA * y + ODMIK, ENOTA * x + ODMIK, ENOTA * y + ENOTA - ODMIK, ENOTA* x + ENOTA - ODMIK, fill='black')
 
     def osvezi(self):
         self.plosca.delete('all')
@@ -48,7 +52,7 @@ class Othello:
             print('Poteza ni veljavna.')
 
     def rezultat(self):
-        print('B:{} C:{}'.format(self.igra.figure.bele_figure, self.igra.figure.crne_figure))
+        print('B:{} C:{}'.format(len(self.igra.tocke_B), len(self.igra.tocke_C)))
 
 okno = tk.Tk()
 moj_program = Othello(okno)
